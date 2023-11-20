@@ -1,0 +1,44 @@
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  #    default-property-inclusion: non_null # JSON处理时忽略非空字段
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
+  datasource:
+    dynamic:
+      primary: master
+      strict: false
+      datasource:
+        master:
+          #    url: jdbc:mysql://127.0.0.1:3306/iccs_scene_deploy?useSSL=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+          #    username: root
+          #    password: hpcn
+
+          ***REMOVED***
+          ***REMOVED***
+          ***REMOVED***
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://127.0.0.1:3306/sts?useSSL=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+          username: root
+          password: ***REMOVED***
+
+
+mybatis-plus:
+
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+logging:
+  level:
+    #      com.hpcn: debug
+    com.hpcn: info
+#      更改tomcat的web端口号,本模块使用老师规定的端口号：9002
+server:
+  port: 20002
+
+
