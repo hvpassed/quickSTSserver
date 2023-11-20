@@ -8,7 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.cwk.qserver.dao.mapper")
+@MapperScan("com.cwk.qserver.dao")
 
 public class QServerApplication {
 

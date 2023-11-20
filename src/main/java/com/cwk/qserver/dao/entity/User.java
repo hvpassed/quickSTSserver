@@ -13,9 +13,10 @@ import lombok.Data;
 public class User {
 
     @JsonProperty("id")
-    @TableId(value ="id",type = IdType.AUTO)
+
     public int id;
 
+    @TableId(value ="username")
     @JsonProperty("username")
     public String username;
 

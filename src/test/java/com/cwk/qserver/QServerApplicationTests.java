@@ -1,5 +1,6 @@
 package com.cwk.qserver;
 
+import com.cwk.qserver.dao.IService.impl.UserServiceimpl;
 import com.cwk.qserver.dao.entity.User;
 import com.cwk.qserver.dao.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
@@ -10,14 +11,14 @@ import org.springframework.stereotype.Service;
 @SpringBootTest
 @Service
 class QServerApplicationTests {
-	@Autowired
-	private UserMapper usermappper;
+    @Autowired
+    private UserServiceimpl userServiceimpl;
 
-	@Test
-	public void test(){
-		User user= new User();
-		user.setUsername("123");
-		user.setPassword("654");
-		usermappper.insert(user);
-	}
+    @Test
+    public void test(){
+        User us = new User();
+        us.setPassword("998");
+        us.setUsername("65498");
+        userServiceimpl.save(us);
+    }
 }
