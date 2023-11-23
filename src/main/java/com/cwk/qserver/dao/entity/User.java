@@ -12,9 +12,8 @@ import lombok.Data;
 @TableName("user")
 public class User {
 
-    @JsonProperty("id")
-
-    public int id;
+    @JsonProperty("userid")
+    public int userid;
 
     @TableId(value ="username")
     @JsonProperty("username")
@@ -22,4 +21,10 @@ public class User {
 
     @JsonProperty("password")
     public String password;
+
+    @JsonProperty("mapid")
+    public int mapid;
+
+    @JsonProperty("hasmap")
+    public int hasmap;
 }

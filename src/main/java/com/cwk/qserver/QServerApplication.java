@@ -13,6 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class QServerApplication {
 
 	public static void main(String[] args) {
+
+
 		SpringApplication.run(QServerApplication.class, args);
 
 

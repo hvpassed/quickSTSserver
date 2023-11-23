@@ -41,4 +41,54 @@ logging:
 server:
   port: 20002
 
+init-cardspile-config:
+  cardList:
 
+    - cardid: 0
+      title: "attack"
+      description: "apply 6 damage"
+      cost: 1
+
+    - cardid: 0
+      title: "attack"
+      description: "apply 6 damage"
+      cost: 1
+
+    - cardid: 0
+      title: "attack"
+      description: "apply 6 damage"
+      cost: 1
+
+    - cardid: 0
+      title: "attack"
+      description: "apply 6 damage"
+      cost: 1
+
+    - cardid: 0
+      title: "attack"
+      description: "apply 6 damage"
+      cost: 1
+
+    - cardid: 1
+      title: "defend"
+      description: "get 5 block"
+      cost: 1
+
+    - cardid: 1
+      title: "defend"
+      description: "get 5 block"
+      cost: 1
+
+    - cardid: 1
+      title: "defend"
+      description: "get 5 block"
+      cost: 1
+
+    - cardid: 1
+      title: "defend"
+      description: "get 5 block"
+      cost: 1
+    - cardid: 1
+      title: "defend"
+      description: "get 5 block"
+      cost: 1

@@ -11,5 +11,5 @@ public class ResponseConstant {
     public static Integer RES_NOT_FOUND = 404;  // 资源耗尽。注：一般发生于线程池饱和的时候，捕捉线程池的相关异常
 
     public static Integer RES_SERVER_ERROR = 500;   // 服务器错误或异常，需要检查日志，进行异常的标注
-    // 其实这个状态码用不到，真正发生服务器异常的时候返回的应该是http状态码500了
+
 }

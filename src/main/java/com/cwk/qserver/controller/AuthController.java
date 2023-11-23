@@ -39,6 +39,7 @@ public class AuthController {
             }
         }
         catch (Exception e){
+            log.error(e.toString());
             return Response.builder().code(LoggingConstant.UNEXCEP_ERR).msg("err "+e.toString()).data("").build();
         }
     }
@@ -51,6 +52,7 @@ public class AuthController {
             ext.eq("username",signing.username);
             User res = userServiceimpl.getOne(ext);
             if(res==null){//不存在
+                signing.setHasmap(0);
                 userServiceimpl.save(signing);
                 return Response.builder().code(LoggingConstant.SIGN_IN_SUCCESS).msg("Signed").data("").build();
             }else {
@@ -59,7 +61,7 @@ public class AuthController {
                         .msg("USER_ALREADY_EXIST").data("").build();
             }
         }catch (Exception e){
-            log.warn("Unexcepted err"+e.toString());
+            log.error("Unexcepted err"+e.toString());
             return Response.builder().code(LoggingConstant.UNEXCEP_ERR).msg("Unexcept_err").data("").build();
         }
     }

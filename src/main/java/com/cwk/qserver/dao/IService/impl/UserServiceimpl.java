@@ -15,10 +15,15 @@ public class UserServiceimpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean save(User entity) {
         QueryWrapper<User> wrapper = Wrappers.query();
-        wrapper.orderByDesc("id").last("LIMIT 1");
+        wrapper.orderByDesc("userid").last("LIMIT 1");
         User res = this.getOne(wrapper);
-        entity.id=res.id+1;
-        log.info(String.format("Signed username:%s,id:%d",entity.username,entity.id));
+        if(res==null){
+            entity.userid=0;
+        }else {
+            entity.userid = res.userid + 1;
+        }
+        entity.setMapid(-1);
+        log.info(String.format("Signed username:%s,id:%d",entity.username,entity.userid));
         return super.save(entity);
     }
 }
