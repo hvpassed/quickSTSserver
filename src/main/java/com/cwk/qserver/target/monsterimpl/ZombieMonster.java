@@ -1,15 +1,15 @@
 package com.cwk.qserver.target.monsterimpl;
 
-import com.cwk.qserver.target.monster;
-import lombok.Data;
+import com.cwk.qserver.dao.entity.Monster;
+import com.cwk.qserver.utils.IsMonster;
 
-
-public class ZombieMonster extends monster {
-    public String name="zombie";
-
-    public String description="it's a zombie";
-
-    public ZombieMonster(int maxhp) {
-        super(maxhp);
+@IsMonster
+public class ZombieMonster extends Monster {
+    public static String name="zombie";
+    public static int type = 1;
+    public static String description="it's a zombie";
+    public static int basehp = 30;
+    public ZombieMonster(int delta,int addOrDe) {
+        super(name,description,basehp,delta,addOrDe,type);
     }
 }

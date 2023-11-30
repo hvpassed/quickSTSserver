@@ -4,15 +4,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.springframework.stereotype.Repository;
-
+//只供地图场景中使用，战斗场景中用BattlePlay
 @Data
 @TableName("player")
 public class Player {
     @JsonProperty("mapid")
-    public int mapid;
+    private int mapid;
 
     @JsonProperty("userid")
-    public int userid;
+    private int userid;
 
     @JsonProperty("maxhp")
     public int maxhp=100;
@@ -28,4 +28,6 @@ public class Player {
 
     @JsonProperty("cardids")
     public String cardids;
+
+
 }

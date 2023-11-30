@@ -3,14 +3,14 @@ package com.cwk.qserver.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cwk.qserver.card.CardsPile;
-import com.cwk.qserver.card.CardsPileFactory;
+import com.cwk.qserver.card.factory.CardsPileFactory;
 import com.cwk.qserver.constant.MapConstant;
 import com.cwk.qserver.dao.IService.impl.MapServiceimpl;
 import com.cwk.qserver.dao.IService.impl.PlayerServiceimpl;
 import com.cwk.qserver.dao.IService.impl.UserServiceimpl;
 import com.cwk.qserver.dao.PlayMapUnion;
 import com.cwk.qserver.dao.Response;
-import com.cwk.qserver.dao.entity.Map;
+import com.cwk.qserver.dao.entity.MapEntity;
 import com.cwk.qserver.dao.entity.Player;
 import com.cwk.qserver.dao.entity.User;
 import lombok.Data;
@@ -38,13 +38,13 @@ public class MapController {
     private CardsPileFactory cardsPileFactory;
     @PostMapping("/initMap")
     @ResponseBody
-    public Response initMap(@RequestBody Map entity){
+    public Response initMap(@RequestBody MapEntity entity){
         try {
             log.info("query "+entity.toString());
-            QueryWrapper<Map> qw = Wrappers.query();
+            QueryWrapper<MapEntity> qw = Wrappers.query();
             qw.eq("userid",entity.getUserid());
             mapServiceimpl.saveOrUpdate(entity,qw);
-            Map res = mapServiceimpl.getOne(qw);
+            MapEntity res = mapServiceimpl.getOne(qw);
             if(res==null) {
                 //创建地图失败
                 return Response.builder().code(MapConstant.MAP_CREATED_FAILED).msg("MAP_CREATED_FAILED").data("").build();
@@ -79,7 +79,7 @@ public class MapController {
                     }
                     PlayMapUnion ret = new PlayMapUnion();
                     ret.player = player;
-                    ret.map=res;
+                    ret.mapEntity =res;
                     return Response.builder().code(MapConstant.MAP_CREATED).msg("MAP_CREATED").data(ret).build();
                 }
 
@@ -103,16 +103,16 @@ public class MapController {
             }else{
 
                 if(res.getHasmap()==1){
-                    QueryWrapper<Map> mq = Wrappers.query();
+                    QueryWrapper<MapEntity> mq = Wrappers.query();
                     mq.eq("mapid",res.getMapid());
-                    Map map = mapServiceimpl.getOne(mq);
-                    if(map==null){
+                    MapEntity mapEntity = mapServiceimpl.getOne(mq);
+                    if(mapEntity ==null){
                         log.error("a map missed");
                         return Response.builder().code(MapConstant.UNEXCEPTED_ERR).msg("USER_MISSED").data("").build();
                     }else{
 
                         QueryWrapper<Player> pq = Wrappers.query();
-                        pq.eq("mapid",map.getMapid()).eq("userid",entity.getUserid());
+                        pq.eq("mapid", mapEntity.getMapid()).eq("userid",entity.getUserid());
                         Player player = playerServiceimpl.getOne(pq);
                         if(player==null){
                             log.error("a player missed");
@@ -120,7 +120,7 @@ public class MapController {
                         }else{
                             PlayMapUnion playMapUnion = new PlayMapUnion();
                             playMapUnion.player=player;
-                            playMapUnion.map=map;
+                            playMapUnion.mapEntity = mapEntity;
                             return Response.builder().code(MapConstant.MAP_FOUNDED).msg("MAP_FOUNDED").data(playMapUnion).build();
                         }
                         //return Response.builder().code(MapConstant.MAP_FOUNDED).msg("MAP_FOUNDED").data(map).build();
@@ -140,6 +140,7 @@ public class MapController {
     @ResponseBody
     public Response updateUserInfo(@RequestBody User entity){
         try {
+
             return Response.builder().build();
 
         }catch (Exception err){

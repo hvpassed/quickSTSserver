@@ -5,24 +5,22 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cwk.qserver.dao.IService.MapService;
-import com.cwk.qserver.dao.entity.Map;
-import com.cwk.qserver.dao.entity.User;
+import com.cwk.qserver.dao.entity.MapEntity;
 import com.cwk.qserver.dao.mapper.MapMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Random;
 
 @Slf4j
 @Service
-public class MapServiceimpl extends ServiceImpl<MapMapper, Map> implements MapService {
+public class MapServiceimpl extends ServiceImpl<MapMapper, MapEntity> implements MapService {
 
     @Override
-    public boolean saveOrUpdate(Map entity, Wrapper<Map> updateWrapper) {
-        QueryWrapper<Map> wrapper = Wrappers.query();
+    public boolean saveOrUpdate(MapEntity entity, Wrapper<MapEntity> updateWrapper) {
+        QueryWrapper<MapEntity> wrapper = Wrappers.query();
         wrapper.orderByDesc("mapid").last("LIMIT 1");
-        Map res = this.getOne(wrapper);
+        MapEntity res = this.getOne(wrapper);
         if(res==null){
             entity.setMapid(0);
         }else {

@@ -1,5 +1,7 @@
-package com.cwk.qserver.card;
+package com.cwk.qserver.card.factory;
 
+import com.cwk.qserver.card.Card;
+import com.cwk.qserver.card.CardsPile;
 import lombok.Data;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;

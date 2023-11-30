@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @TableName("maps")
-public class Map {
+public class MapEntity {
     @JsonProperty("mapid")
     @TableId(value = "mapid",type= IdType.AUTO)
     private int mapid;
@@ -20,6 +20,6 @@ public class Map {
     private String currentposition;
 
     @JsonProperty("seed")
-    private int seed;
+    private long seed;
 
 }
