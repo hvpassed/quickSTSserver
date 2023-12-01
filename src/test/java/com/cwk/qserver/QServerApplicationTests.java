@@ -73,7 +73,7 @@ class QServerApplicationTests {
     public void monsterinittest(){
 
         try {
-            Monster.InitMonsters(new Random(1),3);
+            Monster.InitMonsters(new Random(1),3,"[0,0]");
         } catch (Exception e) {
             e.printStackTrace();
         }

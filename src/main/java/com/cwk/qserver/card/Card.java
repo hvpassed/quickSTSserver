@@ -1,15 +1,27 @@
 package com.cwk.qserver.card;
 
+import com.cwk.qserver.utils.IsCard;
 import lombok.Data;
 
 @Data
+@IsCard(cardId = -1)
 public class Card {
-    private int cardid;
+    protected int cardid;
 
-    private String title;
+    protected String title;
 
-    private String description;
+    protected String description;
 
-    private int cost;
+    protected int cost;
 
+
+
+
+    public Card(){
+
+    }
+
+    public Card(int cardid){
+        this.cardid =cardid;
+    }
 }

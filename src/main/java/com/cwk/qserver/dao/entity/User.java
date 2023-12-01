@@ -3,6 +3,7 @@ package com.cwk.qserver.dao.entity;/*
  */
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,4 +28,8 @@ public class User {
 
     @JsonProperty("hasmap")
     public int hasmap;
+
+    @JsonProperty("enter_pos")
+    @TableField(exist = false)
+    public String enterPos;
 }

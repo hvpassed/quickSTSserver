@@ -27,6 +27,7 @@ public class AuthController {
     @ResponseBody
     public Response logging(@RequestBody User loggingpara){
         try {
+            log.info("try log in user:"+loggingpara.getUsername());
             QueryWrapper<User> wrapper = Wrappers.query();
             wrapper.eq("username",loggingpara.username).eq("password",loggingpara.password);
             User rs = userServiceimpl.getOne(wrapper);

@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cwk.qserver.card.Card;
 import com.cwk.qserver.dao.IService.impl.MonsterServiceimpl;
+import com.cwk.qserver.dao.Intent;
 import com.cwk.qserver.utils.ApplicationContextUtil;
 import com.cwk.qserver.utils.IsMonster;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,11 +41,18 @@ public class Monster {
     public long seed;
     @JsonProperty("block")
     public int block=0;
+
+    @JsonProperty("difficulty")
+    public int difficulty;
     public Monster(){
 
     }
 
-    public Monster(String name,String description,int basehp,int delta,int addOrDe,int type){
+    public Monster(String name,String description,int basehp,int delta,int addOrDe,int type,String pos){
+        String json = String.format("{\"Array\":%s}",pos);
+        JSONObject jsonObj = JSON.parseObject(json);
+        List<Integer> posl = jsonObj.getObject("Array", List.class);
+        this.difficulty =posl.get(0);
         QueryWrapper<Monster> wrapper = Wrappers.query();
         wrapper.orderByDesc("monsterid").last("LIMIT 1");
         Monster res = ApplicationContextUtil.getBean(MonsterServiceimpl.class).getOne(wrapper);
@@ -73,6 +81,9 @@ public class Monster {
 
     }
 
+    public Intent generateIntent(){
+        return new Intent();
+    }
 
     public static String serializeByMonsters(List<Monster> monsters){
         List<Integer> list = new ArrayList<>();
@@ -101,9 +112,9 @@ public class Monster {
             throw new Exception();
         }
     }
-    public static List<Monster> InitMonsters(Random random,int amount) throws Exception {
+    public static List<Monster> InitMonsters(Random random,int amount,String pos) throws Exception {
         try {
-
+            //获取所有怪物类
             Reflections reflections = new Reflections("com.cwk.qserver.target.monsterimpl");
             Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(IsMonster.class);
             List<Class<?>> declaredMonster = new ArrayList<>(annotatedClasses);
@@ -118,7 +129,7 @@ public class Monster {
                 int addOrDe = random.nextInt(2);
                 int basehp = declaredMonster.get(index).getField("basehp").getInt(null);
                 int delta = random.nextInt((int) (basehp*0.5));
-                Monster monster = (Monster) declaredMonster.get(index).getDeclaredConstructor(int.class,int.class).newInstance(delta,addOrDe);
+                Monster monster = (Monster) declaredMonster.get(index).getDeclaredConstructor(int.class,int.class,String.class).newInstance(delta,addOrDe,pos);
                 monster.seed = random.nextInt();
                 monsters.add(monster);
 

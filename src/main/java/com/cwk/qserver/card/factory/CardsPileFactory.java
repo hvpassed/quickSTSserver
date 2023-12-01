@@ -23,6 +23,7 @@ public class CardsPileFactory{
     @Bean
     @Scope("prototype")
     public CardsPile getObject() throws Exception {
+        System.out.println(this.cardList);
         return new CardsPile(this.cardList);
     }
 
