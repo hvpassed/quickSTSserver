@@ -2,6 +2,7 @@ package com.cwk.qserver.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cwk.qserver.target.BattlePlayer;
+import org.springframework.stereotype.Repository;
 
 /**
  * @BelongsProject: QServer
@@ -11,5 +12,6 @@ import com.cwk.qserver.target.BattlePlayer;
  * @Description: TODO
  * @Version: 1.0
  */
+@Repository
 public interface BattlePlayerMapper extends BaseMapper<BattlePlayer> {
 }

@@ -7,11 +7,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.cwk.qserver.card.CardsPile;
 import com.cwk.qserver.dao.entity.Player;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @TableName("battle_players")
+@Data
 public class BattlePlayer  {
 
     @JsonProperty("userid")
@@ -43,19 +45,32 @@ public class BattlePlayer  {
 
     @JsonProperty("discord_pile")
     public String discordPileString;
+
+    @JsonProperty("cost")
+    public int cost =3;
     //总牌堆
     @TableField(exist = false)
     public List<Integer> allPile = new ArrayList<>();
     //抽牌堆，存储cardid，反射实例化类，
     @TableField(exist = false)
     public List<Integer> drawPile = new ArrayList<>();
-
     //手牌对
     @TableField(exist = false)
     public List<Integer> handPile = new ArrayList<>();
     //弃牌堆
     @TableField(exist = false)
     public List<Integer> discordPile = new ArrayList<>();
+
+
+    public BattlePlayer(){
+
+    }
+    public BattlePlayer(Player player){
+        this.userid= player.getUserid();
+        this.maxhp = player.getMaxhp();
+        this.nowhp = player.getNowhp();
+    }
+
 
     public void serialize() {
         this.allPileString = CardsPile.serialize(allPile);
@@ -76,12 +91,7 @@ public class BattlePlayer  {
 
 
 
-    public BattlePlayer(@org.jetbrains.annotations.NotNull Player player){
-        this.userid= player.getUserid();
-        this.maxhp = player.maxhp;
-        this.nowhp = player.nowhp;
 
-    }
 //    public CardsPile cardsPile;//全部的牌
     public void ApplyDamage(int damage){
 

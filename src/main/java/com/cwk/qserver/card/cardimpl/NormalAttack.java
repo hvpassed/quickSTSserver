@@ -1,6 +1,8 @@
 package com.cwk.qserver.card.cardimpl;
 
 import com.cwk.qserver.card.AttackCard;
+import com.cwk.qserver.constant.CardTargetConstant;
+import com.cwk.qserver.dao.entity.Monster;
 import com.cwk.qserver.utils.IsCard;
 
 /**
@@ -24,10 +26,32 @@ public class NormalAttack extends AttackCard {
     public NormalAttack(){
         super(getCardIdByAnn());
         this.attackCount=1;
-        this.damage = 6;
+        this.damage = 30;
         this.title="普通攻击";
-        this.description="造成6点伤害";
+        this.description=String.format("造成%d点伤害",this.damage);
         this.cost=1;
+        this.select= CardTargetConstant.SINGLE_MONSTER;
     }
 
+    @Override
+    public void impact(Object obj) {
+        Monster monster = (Monster) obj;
+        int nowBlock = monster.getBlock();
+        int nowHp = monster.getNowhp();
+
+        if (nowBlock > 0) {
+            int damage = this.damage - nowBlock;
+            nowBlock = (Math.max(nowBlock - this.damage, 0));
+            monster.setBlock(nowBlock);
+            if (damage > 0) {
+                monster.setNowhp(nowHp - damage);
+            }
+        } else {
+            monster.setNowhp(nowHp - this.damage);
+        }
+        if(monster.getNowhp()<0){
+            monster.setNowhp(0);
+        }
+
+    }
 }

@@ -21,16 +21,16 @@ spring:
 
 mybatis-plus:
 
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: auto
 logging:
   level:
-    #      com.hpcn: debug
+
     com.hpcn: info
-#      更改tomcat的web端口号,本模块使用老师规定的端口号：9002
+
 server:
   port: 20002
 
