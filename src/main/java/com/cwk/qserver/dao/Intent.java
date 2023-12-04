@@ -37,8 +37,11 @@ public class Intent {
     public int blockGain;
 
     @JsonProperty("attack_amount")
-    public int attack_amount;
+    public int attackAmount;
 
     @JsonProperty("attack")
     public int attack;
+
+    @JsonProperty("type")
+    public int type;
 }

@@ -5,10 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cwk.qserver.card.Card;
+import com.cwk.qserver.card.CardsPile;
 import com.cwk.qserver.card.factory.CardFactory;
 import com.cwk.qserver.constant.CardTargetConstant;
 import com.cwk.qserver.constant.ResponseConstant;
 import com.cwk.qserver.dao.IService.impl.BattlePlayerServiceimpl;
+import com.cwk.qserver.dao.IService.impl.IntentServiceimpl;
 import com.cwk.qserver.dao.IService.impl.PlayerServiceimpl;
 import com.cwk.qserver.dao.Response;
 import com.cwk.qserver.dao.entity.Monster;
@@ -46,6 +48,9 @@ public class BattleController {
 
     @Autowired
     private BattlePlayerServiceimpl battlePlayerService;
+
+    @Autowired
+    private IntentServiceimpl intentService;
     @PostMapping("/initBattle")
     @ResponseBody
     public Response initBattle(@RequestBody User entity){
@@ -126,6 +131,55 @@ public class BattleController {
 
             return Response.builder().code(ResponseConstant.RES_OK).msg("成功出牌").data(ret).build();
 
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return Response.builder().code(ResponseConstant.RES_NEED_CHECK).msg("未知错误："+e.getMessage()).data("").build();
+        }
+    }
+
+    @PostMapping("/endTurn")
+    @ResponseBody
+    public Response endTurn(@RequestBody BattlePlayer entity){
+        try {
+            int userid = entity.getUserid();
+            BattlePlayer battlePlayer = battlePlayerService.getById(userid);
+
+            if(battlePlayer==null){
+                log.error("Could not find battle_player by userid:"+userid);
+                throw new RuntimeException();
+            }
+            battlePlayer.unSerialize();
+            Random random = new Random(battlePlayer.getSeed());
+            Map<String,Object> ret = CardsPile.drawCards(battlePlayer.getDrawPile(),battlePlayer.getDiscordPile(),battlePlayer.getHandPile(),battlePlayer.getDrawAmount(),random);
+            battlePlayer.setSeed(random.nextInt());
+
+            battlePlayer.setDrawPile((List<Integer>) ret.get("drawPile"));
+            battlePlayer.setHandPile((List<Integer>) ret.get("handPile"));
+            battlePlayer.setDiscordPile((List<Integer>) ret.get("discordPile"));
+            battlePlayer.serialize();
+            battlePlayerService.saveOrUpdate(battlePlayer);
+            BattleManager battleManager = new BattleManager(userid);
+            ret.putAll(battleManager.endTurn(userid));
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功抽牌").data(ret).build();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return Response.builder().code(ResponseConstant.RES_NEED_CHECK).msg("未知错误："+e.getMessage()).data("").build();
+        }
+
+
+    }
+
+    @PostMapping("/reInitBattle")
+    @ResponseBody
+    public Response reInitBattle(@RequestBody User entity){
+        try {
+
+
+
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功重置").data( BattleManager.reInitBattle(entity.getUserid())).build();
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());

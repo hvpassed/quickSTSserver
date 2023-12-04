@@ -48,6 +48,15 @@ public class BattlePlayer  {
 
     @JsonProperty("cost")
     public int cost =3;
+
+    @JsonProperty("draw_amount")
+    public int drawAmount = 4;
+
+    @JsonProperty("damage_reduction")
+    public int damageReduction = 0;
+
+    @JsonProperty("block_clear")
+    public int blockClear = 0;
     //总牌堆
     @TableField(exist = false)
     public List<Integer> allPile = new ArrayList<>();
@@ -61,6 +70,13 @@ public class BattlePlayer  {
     @TableField(exist = false)
     public List<Integer> discordPile = new ArrayList<>();
 
+
+
+    public void clearBlock(){
+        if(this.blockClear==0){
+            this.block=0;
+        }
+    }
 
     public BattlePlayer(){
 
@@ -89,6 +105,30 @@ public class BattlePlayer  {
         }
     }
 
+    public void ApplyDamage(int attack,int attack_amount){
+        for(int i = 0;i<attack_amount;i++)
+        {
+            int temp = attack-damageReduction;
+            if(temp<=0){
+                continue;
+            }
+            if(block>0){
+                if(block>=temp){
+                    block-=temp;
+                    continue;
+                }else{
+                    temp-=block;
+                    block=0;
+                }
+            }
+            this.nowhp-=temp;
+        }
+
+        if(this.nowhp<0)
+        {
+            this.nowhp=0;
+        }
+    }
 
 
 

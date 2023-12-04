@@ -11,17 +11,23 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.cwk.qserver.card.Card;
 import com.cwk.qserver.dao.IService.impl.MonsterServiceimpl;
 import com.cwk.qserver.dao.Intent;
+import com.cwk.qserver.target.BattlePlayer;
 import com.cwk.qserver.utils.ApplicationContextUtil;
 import com.cwk.qserver.utils.IsMonster;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.reflections.Reflections;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 @Data
 @TableName("monsters")
 public class Monster {
+
+
     @JsonProperty("monsterid")
     @TableId(value = "monsterid",type = IdType.INPUT)
     public int monsterid;
@@ -44,10 +50,46 @@ public class Monster {
 
     @JsonProperty("difficulty")
     public int difficulty;
+
+    @JsonProperty("damage_reduction")
+    public int damageReduction = 0;
+
+    @JsonProperty("block_clear")
+    public int blockClear = 0;
+
+    @TableField(exist = false)
+    @JsonIgnore
+    public   Map<Integer, Method> intentFieldMap ; //方法id，方法
     public Monster(){
 
     }
-
+    public void clearBlock(){
+        if(this.blockClear==0){
+            this.block=0;
+        }
+    }
+    public Monster(String name ,int type,String description){
+        this.name=name;
+        this.type=type;
+        this.description=description;
+    }
+    public static Map<Integer,Class<?>> getMonsterTypeMap(){
+        Map<Integer,Class<?>> map = new HashMap<>();
+        Reflections reflections = new Reflections("com.cwk.qserver.target.monsterimpl");
+        Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(IsMonster.class);
+        List<Class<?>> declaredMonster = new ArrayList<>(annotatedClasses);
+        for (Class<?> monster:declaredMonster
+             ) {
+            try {
+                map.put(monster.getField("type").getInt(null),monster);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+        }
+        return map;
+    }
     public Monster(String name,String description,int basehp,int delta,int addOrDe,int type,String pos){
         String json = String.format("{\"Array\":%s}",pos);
         JSONObject jsonObj = JSON.parseObject(json);
@@ -71,9 +113,7 @@ public class Monster {
             this.nowhp=this.maxhp;
         }
         this.type=type;
-        MonsterServiceimpl monsterService = ApplicationContextUtil.getBean(MonsterServiceimpl.class);
 
-        monsterService.saveOrUpdate(this);
 
 
     }
@@ -81,7 +121,7 @@ public class Monster {
 
     }
 
-    public Intent generateIntent(){
+    public  Intent generateIntent(){
         return new Intent();
     }
 
@@ -129,8 +169,8 @@ public class Monster {
                 int addOrDe = random.nextInt(2);
                 int basehp = declaredMonster.get(index).getField("basehp").getInt(null);
                 int delta = random.nextInt((int) (basehp*0.5));
-                Monster monster = (Monster) declaredMonster.get(index).getDeclaredConstructor(int.class,int.class,String.class).newInstance(delta,addOrDe,pos);
-                monster.seed = random.nextInt();
+                Monster monster = (Monster) declaredMonster.get(index).getDeclaredConstructor(int.class,int.class,String.class,int.class).newInstance(delta,addOrDe,pos,random.nextInt());
+
                 monsters.add(monster);
 
             }
@@ -141,4 +181,7 @@ public class Monster {
         }
     }
 
+    public Object IntentApply (Object object) throws RuntimeException, InvocationTargetException, IllegalAccessException{
+        return null;
+    }
 }

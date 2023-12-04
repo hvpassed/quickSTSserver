@@ -36,18 +36,19 @@ public class NormalAttack extends AttackCard {
     @Override
     public void impact(Object obj) {
         Monster monster = (Monster) obj;
+
         int nowBlock = monster.getBlock();
         int nowHp = monster.getNowhp();
-
+        int attackdamge = this.damage-monster.getDamageReduction();
         if (nowBlock > 0) {
-            int damage = this.damage - nowBlock;
-            nowBlock = (Math.max(nowBlock - this.damage, 0));
+            int damage = attackdamge - nowBlock;
+            nowBlock = (Math.max(nowBlock - attackdamge, 0));
             monster.setBlock(nowBlock);
             if (damage > 0) {
                 monster.setNowhp(nowHp - damage);
             }
         } else {
-            monster.setNowhp(nowHp - this.damage);
+            monster.setNowhp(nowHp - attackdamge);
         }
         if(monster.getNowhp()<0){
             monster.setNowhp(0);

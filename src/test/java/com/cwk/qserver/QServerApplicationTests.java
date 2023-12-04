@@ -45,7 +45,7 @@ class QServerApplicationTests {
         for (int i = 0; i < nums2.length; i++) {
             list1.add(nums2[i]);
         }
-        System.out.println(CardsPile.drawCards(list,list1,20,new Random(1)));
+        System.out.println(CardsPile.drawCards(list,list1,new ArrayList<>(),20,new Random(1)));
 
     }
     @Test

@@ -26,7 +26,7 @@ import java.util.*;
 @Component
 public class CardFactory {
     private Map<Integer,Class<?>> cardIdMapCardClass = new HashMap<>();
-
+    public static final int allCards = 2;
     public CardFactory(){
         Reflections reflections = new Reflections("com.cwk.qserver.card.cardimpl");
         Set<Class<?>> cardsClass = reflections.getTypesAnnotatedWith(IsCard.class);

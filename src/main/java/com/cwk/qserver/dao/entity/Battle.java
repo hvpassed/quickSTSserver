@@ -25,7 +25,7 @@ public class Battle {
     @JsonProperty("curpos")
     public String curpos;//现在的位置
 
-    @JsonProperty("seed")//战斗长久所用的种子
+    @JsonProperty("seed")//战斗长久所用的种子，不能改变
     public long seed;
 
     @JsonProperty("monsters")//存储当前战斗场景怪物id，每个怪物实体都有唯一id，其属性存储在数据库中，通过数据库数据实例化
