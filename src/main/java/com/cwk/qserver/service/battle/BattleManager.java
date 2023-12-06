@@ -376,7 +376,7 @@ public class BattleManager {
         return ret;
     }
 
-    public List<Card> winTurn(int userid) throws RuntimeException{
+    public Map<String,Object> winBattle(int userid) throws Exception {
         //删除怪物
         MonsterServiceimpl monsterService = ApplicationContextUtil.getBean(MonsterServiceimpl.class);
         monsterService.removeBatchByIds(this.monstersList);
@@ -394,7 +394,9 @@ public class BattleManager {
             throw new RuntimeException();
         }
         player.setPlaying(0);
-        playerService.saveOrUpdate(player);
+
+        List<Integer> allCardids =CardsPile.unSerialize( player.getCardids());
+        playerService.saveOrUpdate(player,playerQueryWrapper);
 
 
         //更新map
@@ -411,6 +413,7 @@ public class BattleManager {
         mapService.saveOrUpdate(mapEntity);
 
         //回传 待择的卡牌
+        Map<String,Object> ret = new HashMap<>();
         CardFactory cardFactory = ApplicationContextUtil.getBean(CardFactory.class);
         List<Integer> cardids = new ArrayList<>();
         List<Card> Cards = new ArrayList<>();
@@ -424,7 +427,15 @@ public class BattleManager {
             st.add(cardids.remove(0));
             Cards.add(cardFactory.createCardById(st).get(0));
         }
-
-        return  Cards;
+        List<Card> allCard = new ArrayList<>();
+        for (Integer i:allCardids
+             ) {
+            Set<Integer> st = new HashSet<>();
+            st.add(i);
+            allCard.add(cardFactory.createCardById(st).get(0));
+        }
+        ret.put("SelectCards",Cards);
+        ret.put("AllCards",allCard);
+        return  ret ;
     }
 }

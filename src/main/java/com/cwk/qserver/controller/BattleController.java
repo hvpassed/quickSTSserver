@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.cwk.qserver.bean.postBody.DeleteCardParam;
+import com.cwk.qserver.bean.postBody.RecoverParam;
 import com.cwk.qserver.card.Card;
 import com.cwk.qserver.card.CardsPile;
 import com.cwk.qserver.card.factory.CardFactory;
@@ -176,9 +178,6 @@ public class BattleController {
     @ResponseBody
     public Response reInitBattle(@RequestBody User entity){
         try {
-
-
-
             return Response.builder().code(ResponseConstant.RES_OK).msg("成功重置").data( BattleManager.reInitBattle(entity.getUserid())).build();
         }catch (Exception e){
             e.printStackTrace();
@@ -186,6 +185,100 @@ public class BattleController {
             return Response.builder().code(ResponseConstant.RES_NEED_CHECK).msg("未知错误："+e.getMessage()).data("").build();
         }
     }
+
+    @PostMapping("/winBattle")
+    @ResponseBody
+    public Response winBattle(@RequestBody User entity){
+        try {
+            BattleManager battleManager = new BattleManager(entity.getUserid());
+            if(battleManager==null){
+                log.error("Could not find battleManager by userid:"+entity.getUserid());
+                throw new RuntimeException();
+            }
+
+            Map<String,Object> cards =  battleManager.winBattle(entity.getUserid());
+
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功结束游戏").data(cards).build();
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return Response.builder().code(ResponseConstant.RES_NEED_CHECK).msg("未知错误："+e.getMessage()).data("").build();
+        }
+    }
+    @PostMapping("/addCard")
+    @ResponseBody
+    public Response addCard(@RequestBody Player entity){
+        try {
+            int userid = entity.getUserid();
+            int cardid = Integer.parseInt(entity.getCardids());
+            int mapid = entity.getMapid();
+            QueryWrapper<Player> queryWrapper = Wrappers.query();
+            queryWrapper.eq("userid",userid).eq("mapid",mapid);
+            Player player = playerService.getOne(queryWrapper);
+            List<Integer> cardidsList = CardsPile.unSerialize(player.getCardids());
+            cardidsList.add(cardid);
+            player.setCardids(CardsPile.serialize(cardidsList));
+
+            playerService.saveOrUpdate(player,queryWrapper);
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功添加卡牌").data("").build();
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return Response.builder().code(ResponseConstant.RES_NEED_CHECK).msg("未知错误："+e.getMessage()).data("").build();
+        }
+    }
+
+    @PostMapping("/deleteCard")
+    @ResponseBody
+    public Response deleteCard(@RequestBody DeleteCardParam entity) {
+        try {
+            int userid = entity.getUserid();
+            int cardid = entity.getCardid();
+            int mapid = entity.getMapid();
+            int cardIndex = entity.getCardIndex();
+            QueryWrapper<Player> queryWrapper = Wrappers.query();
+            queryWrapper.eq("userid",userid).eq("mapid",mapid);
+            Player player = playerService.getOne(queryWrapper);
+            List<Integer> cardidsList = CardsPile.unSerialize(player.getCardids());
+            //cardidsList.remove(cardidsList.indexOf(cardid));
+            int removed = cardidsList.remove(cardIndex);
+            if(removed!=cardid){
+                throw new RuntimeException("cardid not match");
+
+            }
+            player.setCardids(CardsPile.serialize(cardidsList));
+
+            playerService.saveOrUpdate(player,queryWrapper);
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功删除卡牌").data("").build();
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return Response.builder().code(ResponseConstant.RES_NEED_CHECK).msg("未知错误："+e.getMessage()).data("").build();
+        }
+    }
+
+    @PostMapping("recoverHp")
+    @ResponseBody
+    public Response recoverHp(@RequestBody RecoverParam entity){
+        try {
+            int userid = entity.getUserid();
+            int mapid = entity.getMapid();
+            int recoverHp = entity.getValue();
+            QueryWrapper<Player> queryWrapper = Wrappers.query();
+            queryWrapper.eq("userid",userid).eq("mapid",mapid);
+            Player player = playerService.getOne(queryWrapper);
+            int nowhp = Math.min(player.getMaxhp(),player.getNowhp()+recoverHp);
+            player.setNowhp(nowhp);
+            playerService.saveOrUpdate(player,queryWrapper);
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功恢复血量").data("").build();
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return Response.builder().code(ResponseConstant.RES_NEED_CHECK).msg("未知错误："+e.getMessage()).data("").build();
+        }
+    }
+
+
 }
 
 class  Params{

@@ -26,7 +26,7 @@ public class NormalAttack extends AttackCard {
     public NormalAttack(){
         super(getCardIdByAnn());
         this.attackCount=1;
-        this.damage = 30;
+        this.damage = 6;
         this.title="普通攻击";
         this.description=String.format("造成%d点伤害",this.damage);
         this.cost=1;
