@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cwk.qserver.card.Card;
 import com.cwk.qserver.card.CardsPile;
+import com.cwk.qserver.card.factory.CardFactory;
 import com.cwk.qserver.card.factory.CardsPileFactory;
 import com.cwk.qserver.dao.IService.impl.UserServiceimpl;
 import com.cwk.qserver.dao.entity.Monster;
@@ -24,6 +25,10 @@ class QServerApplicationTests {
     private UserServiceimpl userServiceimpl;
     @Autowired
     private CardsPileFactory cardsPileFactory;
+    @Test
+    public void testAllCards(){
+        System.out.println(CardFactory.allCards);
+    }
     @Test
     public void testBattleGene(){
         try {

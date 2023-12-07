@@ -12,6 +12,7 @@ import com.cwk.qserver.card.Card;
 import com.cwk.qserver.dao.IService.impl.MonsterServiceimpl;
 import com.cwk.qserver.dao.Intent;
 import com.cwk.qserver.target.BattlePlayer;
+import com.cwk.qserver.target.BossSet;
 import com.cwk.qserver.utils.ApplicationContextUtil;
 import com.cwk.qserver.utils.IsMonster;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -158,7 +159,11 @@ public class Monster {
             Reflections reflections = new Reflections("com.cwk.qserver.target.monsterimpl");
             Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(IsMonster.class);
             List<Class<?>> declaredMonster = new ArrayList<>(annotatedClasses);
-            System.out.println((declaredMonster));
+            Set<Class> bossSet = BossSet.getBossSet();
+            for (Class<?> boss:bossSet
+                 ) {
+                declaredMonster.remove(boss);
+            }
 
             List<Monster> monsters = new ArrayList<>();
 
@@ -179,6 +184,28 @@ public class Monster {
         }catch (Exception e){
             throw e;
         }
+    }
+
+    public void damageApply(int attack_amount,int attack){
+        for (int i = 0; i < attack_amount; i++) {
+            int nowBlock = this.getBlock();
+            int nowHp = this.getNowhp();
+            int attackdamge = attack - this.getDamageReduction();
+            if (nowBlock > 0) {
+                int damage = attackdamge - nowBlock;
+                nowBlock = (Math.max(nowBlock - attackdamge, 0));
+                this.setBlock(nowBlock);
+                if (damage > 0) {
+                    this.setNowhp(nowHp - damage);
+                }
+            } else {
+                this.setNowhp(nowHp - attackdamge);
+            }
+            if (this.getNowhp() < 0) {
+                this.setNowhp(0);
+            }
+        }
+
     }
 
     public Object IntentApply (Object object) throws RuntimeException, InvocationTargetException, IllegalAccessException{

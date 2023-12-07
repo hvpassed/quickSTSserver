@@ -1,6 +1,7 @@
 package com.cwk.qserver.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,5 +22,9 @@ public class MapEntity {
 
     @JsonProperty("seed")
     private long seed;
+
+    @JsonProperty("endPos")
+    @TableField(value = "endPos")
+    private String endPos;
 
 }

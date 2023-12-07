@@ -35,24 +35,7 @@ public class DoubleAttack extends AttackCard {
     @Override
     public void impact(Object obj) {
         Monster monster = (Monster) obj;
-        for (int i = 0; i < this.attackCount; i++) {
-            int nowBlock = monster.getBlock();
-            int nowHp = monster.getNowhp();
-            int attackdamge = this.damage-monster.getDamageReduction();
-            if (nowBlock > 0) {
-                int damage = attackdamge - nowBlock;
-                nowBlock = (Math.max(nowBlock - attackdamge, 0));
-                monster.setBlock(nowBlock);
-                if (damage > 0) {
-                    monster.setNowhp(nowHp - damage);
-                }
-            } else {
-                monster.setNowhp(nowHp - attackdamge);
-            }
-            if(monster.getNowhp()<0){
-                monster.setNowhp(0);
-            }
-        }
+        monster.damageApply(this.attackCount,this.damage);
 
 
     }

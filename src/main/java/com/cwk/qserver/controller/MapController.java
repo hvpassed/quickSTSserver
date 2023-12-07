@@ -95,7 +95,7 @@ public class MapController {
             return  Response.builder().code(MapConstant.UNEXCEPTED_ERR).msg(err.toString()).data("").build();
         }
     }
-    @PostMapping("read")
+    @PostMapping("/read")
     @ResponseBody
     public  Response readMapInfo(@RequestBody User entity){
         try {
@@ -157,35 +157,100 @@ public class MapController {
 
     }
 
-    @PostMapping("/loseGame")
+    @PostMapping("/getEndPos")
     @ResponseBody
-    public Response loseGame(@RequestBody User entity){
+    public Response getEndPos(@RequestBody MapEntity entity){
         try {
-            //删除map，更新user，删除monster；
-            Battle battle = battleService.getById(entity.getUserid());
-            if(battle!=null){
-                //删除monster
-                List<Integer> monsterList = Monster.unSerialize(battle.getMonsters());
-                monsterService.removeBatchByIds(monsterList);
+            int userid = entity.getUserid();
+            QueryWrapper<MapEntity> mapEntityQueryWrapper = Wrappers.query();
+            mapEntityQueryWrapper.eq("userid",userid);
+            MapEntity map = mapServiceimpl.getOne(mapEntityQueryWrapper);
+            if(map==null){
+                log.error("Could not find map by userid:"+userid);
+                throw new Exception();
             }
-            QueryWrapper<User> uq = Wrappers.query();
-            uq.eq("userid",entity.getUserid());
-            User user = userServiceimpl.getOne(uq);
-            if(user==null){
-                return Response.builder().code(ResponseConstant.RES_ILLEGAL_PARAM).msg("用户不存在").data("").build();
-            }
-            int mapid = user.getMapid();
-            user.setHasmap(0);
-            user.setMapid(-1);
-            userServiceimpl.saveOrUpdate(user);
-            UpdateWrapper<MapEntity> uw = Wrappers.update();
-            uw.eq("userid",entity.getUserid()).eq("mapid",mapid);
-            mapServiceimpl.remove(uw);
-            return Response.builder().code(ResponseConstant.RES_OK).msg("成功删除地图").data("").build();
+
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功获取终点").data(map.getEndPos()).build();
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());
             return Response.builder().code(ResponseConstant.RES_ILLEGAL_PARAM).msg("未知错误："+e.getMessage()).data("").build();
         }
     }
+
+
+    @PostMapping("/setEndPos")
+    @ResponseBody
+    public Response setEndPos(@RequestBody MapEntity entity){
+        try {
+            QueryWrapper<MapEntity> mapEntityQueryWrapper = Wrappers.query();
+            mapEntityQueryWrapper.eq("userid",entity.getUserid());
+            MapEntity map = mapServiceimpl.getOne(mapEntityQueryWrapper);
+            if(map==null){
+                log.error("Could not find map by userid:"+entity.getUserid());
+                return Response.builder().code(ResponseConstant.RES_ILLEGAL_PARAM).msg("地图不存在").data("").build();
+            }
+            map.setEndPos(entity.getEndPos());
+            mapServiceimpl.saveOrUpdate(map,mapEntityQueryWrapper);
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功设置终点").data("").build();
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return Response.builder().code(ResponseConstant.RES_ILLEGAL_PARAM).msg("未知错误："+e.getMessage()).data("").build();
+        }
+    }
+
+    @PostMapping("/returnMap")
+    @ResponseBody
+    public Response returnMap(@RequestBody MapEntity  entity){
+        try {
+            int mapid = entity.getMapid();
+            QueryWrapper<MapEntity> mapEntityQueryWrapper = Wrappers.query();
+            mapEntityQueryWrapper.eq("mapid",mapid);
+            MapEntity map = mapServiceimpl.getOne(mapEntityQueryWrapper);
+            if(map==null){
+                log.error("Could not find map by mapid:"+mapid);
+                return Response.builder().code(ResponseConstant.RES_ILLEGAL_PARAM).msg("地图不存在").data("").build();
+            }
+
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功返回地图").data(map).build();
+
+
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return Response.builder().code(ResponseConstant.RES_ILLEGAL_PARAM).msg("未知错误："+e.getMessage()).data("").build();
+        }
+    }
+//    @PostMapping("/loseGame")
+//    @ResponseBody
+//    public Response loseGame(@RequestBody User entity){
+//        try {
+//            //删除map，更新user，删除monster；
+//            Battle battle = battleService.getById(entity.getUserid());
+//            if(battle!=null){
+//                //删除monster
+//                List<Integer> monsterList = Monster.unSerialize(battle.getMonsters());
+//                monsterService.removeBatchByIds(monsterList);
+//            }
+//            QueryWrapper<User> uq = Wrappers.query();
+//            uq.eq("userid",entity.getUserid());
+//            User user = userServiceimpl.getOne(uq);
+//            if(user==null){
+//                return Response.builder().code(ResponseConstant.RES_ILLEGAL_PARAM).msg("用户不存在").data("").build();
+//            }
+//            int mapid = user.getMapid();
+//            user.setHasmap(0);
+//            user.setMapid(-1);
+//            userServiceimpl.saveOrUpdate(user);
+//            UpdateWrapper<MapEntity> uw = Wrappers.update();
+//            uw.eq("userid",entity.getUserid()).eq("mapid",mapid);
+//            mapServiceimpl.remove(uw);
+//            return Response.builder().code(ResponseConstant.RES_OK).msg("成功删除地图").data("").build();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            log.error(e.getMessage());
+//            return Response.builder().code(ResponseConstant.RES_ILLEGAL_PARAM).msg("未知错误："+e.getMessage()).data("").build();
+//        }
+//    }
 }

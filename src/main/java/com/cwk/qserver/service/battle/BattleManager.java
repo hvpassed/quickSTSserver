@@ -13,6 +13,7 @@ import com.cwk.qserver.dao.IService.impl.*;
 import com.cwk.qserver.dao.Intent;
 import com.cwk.qserver.dao.entity.*;
 import com.cwk.qserver.target.BattlePlayer;
+import com.cwk.qserver.target.monsterimpl.BossMonster;
 import com.cwk.qserver.utils.ApplicationContextUtil;
 import lombok.Data;
 import lombok.Getter;
@@ -146,6 +147,95 @@ public class BattleManager {
         return ret;
 
 
+    }
+
+    public static Map<String,Object> BattleManagerInitAndSavaBoss(int userid,int mapid,String pos) throws Exception
+    {
+        log.info(String.format("Userid:%d entering %s,Initiating battle,monsters,player",userid,pos));
+        Battle battle = new Battle();
+        //读取player数据，
+        PlayerServiceimpl playerService =  ApplicationContextUtil.getBean(PlayerServiceimpl.class);
+        MapServiceimpl mapService = ApplicationContextUtil.getBean(MapServiceimpl.class);
+        QueryWrapper<MapEntity> mapQueryWrapper = Wrappers.query();
+        mapQueryWrapper.eq("userid",userid).eq("mapid",mapid);
+        MapEntity mapEntity = mapService.getOne(mapQueryWrapper);
+        if(mapEntity ==null){
+            log.error("Could not find map by userid:"+userid+" mapid:"+mapid);
+            throw new Exception();
+        }
+        Random random = new Random(mapEntity.getSeed());
+        String nj = String.format("{\"Array\":%s}",pos);
+        JSONObject njo = JSON.parseObject(nj);
+        List<Integer> ns = njo.getObject("Array",List.class);
+        if(ns.size()!=2){
+            throw new Exception();
+        }
+        //该场战斗的种子
+        for(int i = 0;i<ns.get(0)*10+ns.get(1);i++){
+            random.nextInt();
+        }
+        long seed = random.nextInt();
+        battle.seed=seed;
+        QueryWrapper<Player> playerQueryWrapper = Wrappers.query();
+        playerQueryWrapper.eq("userid",userid);
+        Player player = playerService.getOne(playerQueryWrapper);
+        if(player==null){
+            log.error("Could not find player by userid:"+userid);
+            throw new Exception();
+        }
+        //牌堆处理，将初始化抽牌堆，抽排，初始化弃牌堆
+        BattlePlayer battlePlayer=new BattlePlayer(player);
+        battlePlayer.seed = random.nextInt();;
+        battlePlayer.block=0;
+        //从用户持有的牌中，初始化总牌堆
+        List<Integer> allPile = CardsPile.unSerialize(player.cardids);
+        CardsPile.shuffle(allPile,random);
+        Map<String ,Object> dp = CardsPile.drawCards(allPile,new ArrayList<>(),new ArrayList<>(),battlePlayer.getDrawAmount(),random);
+
+        battle.userid = userid;
+
+        battle.curpos = pos;
+        //生成怪物
+        int monsterAmount = 1;
+
+        Monster boss = new BossMonster(0,0,pos,random.nextInt());
+
+        List<Monster>  createdMonsters =new ArrayList<>();
+        createdMonsters.add(boss);
+        battle.monsters = Monster.serializeByMonsters(createdMonsters);
+
+        battlePlayer.drawPile = (List<Integer>) dp.get("drawPile");
+        battlePlayer.handPile = (List<Integer>) dp.get("handPile");
+        battlePlayer.discordPile = (List<Integer>) dp.get("discordPile");
+        battlePlayer.allPile =allPile;
+
+        battlePlayer.serialize();
+        IntentServiceimpl intentService = ApplicationContextUtil.getBean(IntentServiceimpl.class);
+        List<Intent> intents = new ArrayList<>();
+        for (Monster monster:createdMonsters
+        ) {
+
+            Intent temp = monster.generateIntent();
+            intents.add(temp);
+            intentService.saveOrUpdate(temp);
+        }
+
+        log.info(String.format("Save into database:Battle info %s ,Monsters info:%s",battle.toString(),createdMonsters.toString()));
+        System.out.println(battlePlayer);
+        //持久化
+        BattleServiceimpl battleService = ApplicationContextUtil.getBean(BattleServiceimpl.class);
+        battleService.saveOrUpdate(battle);
+
+
+        BattlePlayerServiceimpl battlePlayerServiceimpl = ApplicationContextUtil.getBean(BattlePlayerServiceimpl.class);
+        battlePlayerServiceimpl.saveOrUpdate(battlePlayer);
+        log.info("Initiated.");
+        Map<String,Object> ret = new HashMap<>();
+        ret.put("battle",battle);
+        ret.put("monsters",createdMonsters);
+        ret.put("battle_player",battlePlayer);
+        ret.put("intents",intents);
+        return ret;
     }
     public static Map<String,Object> BattleManagerInitAndSava(int userid,int mapid,String pos) throws Exception{//进入战斗场景时，调用该方法，初始化战斗场景，并持久化
         log.info(String.format("Userid:%d entering %s,Initiating battle,monsters,player",userid,pos));
@@ -376,7 +466,8 @@ public class BattleManager {
         return ret;
     }
 
-    public Map<String,Object> winBattle(int userid) throws Exception {
+
+    public void removeBattle(int userid){
         //删除怪物
         MonsterServiceimpl monsterService = ApplicationContextUtil.getBean(MonsterServiceimpl.class);
         monsterService.removeBatchByIds(this.monstersList);
@@ -384,6 +475,14 @@ public class BattleManager {
         //删除battle
         BattleServiceimpl battleService = ApplicationContextUtil.getBean(BattleServiceimpl.class);
         battleService.removeById(userid);
+    }
+
+
+
+
+
+    public Map<String,Object> winBattle(int userid) throws Exception {
+
 
         //更新player
         QueryWrapper<Player> playerQueryWrapper = Wrappers.query();
@@ -393,11 +492,12 @@ public class BattleManager {
             log.error("Could not find player by userid:"+userid);
             throw new RuntimeException();
         }
-        player.setPlaying(0);
+        player.setPlaying(1);
 
         List<Integer> allCardids =CardsPile.unSerialize( player.getCardids());
+        player.setNowhp(battlePlayer.getNowhp());
         playerService.saveOrUpdate(player,playerQueryWrapper);
-
+        removeBattle(userid);
 
         //更新map
         MapServiceimpl mapService = ApplicationContextUtil.getBean(MapServiceimpl.class);
@@ -408,7 +508,12 @@ public class BattleManager {
             log.error("Could not find map by userid:"+userid);
             throw new RuntimeException();
         }
-
+        int isWin = 0;
+        if(mapEntity.getEndPos().equals(player.playpos))
+        {
+            log.info("Player win the game");
+            isWin=1;
+        }
         mapEntity.setCurrentposition(player.playpos);
         mapService.saveOrUpdate(mapEntity);
 
@@ -436,6 +541,7 @@ public class BattleManager {
         }
         ret.put("SelectCards",Cards);
         ret.put("AllCards",allCard);
+        ret.put("win",isWin);
         return  ret ;
     }
 }

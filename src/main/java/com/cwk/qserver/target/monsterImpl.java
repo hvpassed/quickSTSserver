@@ -16,6 +16,10 @@ public interface monsterImpl {
     public Object AttackIntentApply(Intent intent, Object obj);
     public Object DefendIntentApply(Intent intent, Object obj);
     public Object SkillIntentApply(Intent intent, Object obj);
+    
+
     public Intent generateIntent();
+
+
     public Object IntentApply (Object object) throws RuntimeException, InvocationTargetException, IllegalAccessException;
 }

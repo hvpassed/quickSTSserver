@@ -5,6 +5,7 @@ import com.cwk.qserver.utils.IsCard;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +25,9 @@ import java.util.*;
 @Data
 @Slf4j
 @Component
-public class CardFactory {
+public class CardFactory implements CommandLineRunner {
     private Map<Integer,Class<?>> cardIdMapCardClass = new HashMap<>();
-    public static final int allCards = 5;
+    public static int allCards;
     public CardFactory(){
         Reflections reflections = new Reflections("com.cwk.qserver.card.cardimpl");
         Set<Class<?>> cardsClass = reflections.getTypesAnnotatedWith(IsCard.class);
@@ -68,4 +69,22 @@ public class CardFactory {
         return ret;
     }
 
+    @Override
+    public void run(String... args) throws Exception {
+        Set<Integer> count = new HashSet<>();
+        Reflections reflections = new Reflections("com.cwk.qserver.card.cardimpl");
+        Set<Class<?>> cardsClass = reflections.getTypesAnnotatedWith(IsCard.class);
+        for (Class<?> clazz:
+                cardsClass) {
+
+            IsCard annotation =clazz.getAnnotation(IsCard.class);
+
+            int cardid = annotation.cardId();
+            count.add(cardid);
+
+
+        }
+        allCards = count.size();
+        log.info("allCards:"+allCards);
+    }
 }

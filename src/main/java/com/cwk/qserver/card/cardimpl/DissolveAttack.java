@@ -9,26 +9,22 @@ import com.cwk.qserver.utils.IsCard;
  * @BelongsProject: QServer
  * @BelongsPackage: com.cwk.qserver.card.cardimpl
  * @Author: chen wenke
- * @CreateTime: 2023-11-30 19:14
+ * @CreateTime: 2023-12-06 14:45
  * @Description: TODO
  * @Version: 1.0
  */
-@IsCard(cardId = 0)
-public class NormalAttack extends AttackCard {
-
+@IsCard(cardId = 5)
+public class DissolveAttack extends AttackCard {
     protected static int getCardIdByAnn(){
-        IsCard isCard= NormalAttack.class.getAnnotation(IsCard.class);
+        IsCard isCard= DissolveAttack.class.getAnnotation(IsCard.class);
         return isCard.cardId();
     }
-
-
-
-    public NormalAttack(){
+    public DissolveAttack(){
         super(getCardIdByAnn());
         this.attackCount=1;
-        this.damage = 30;
-        this.title="普通攻击";
-        this.description=String.format("造成%d点伤害",this.damage);
+        this.damage = 10;
+        this.title="溶解攻击";
+        this.description=String.format("溶解敌人护甲，然后造成%d伤害",this.damage);
         this.cost=1;
         this.select= CardTargetConstant.SINGLE_MONSTER;
     }
@@ -36,6 +32,10 @@ public class NormalAttack extends AttackCard {
     @Override
     public void impact(Object obj) {
         Monster monster = (Monster) obj;
+        monster.setBlock(0);
         monster.damageApply(this.attackCount,this.damage);
     }
+
+
+
 }

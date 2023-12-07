@@ -28,8 +28,12 @@ public class MapServiceimpl extends ServiceImpl<MapMapper, MapEntity> implements
         }
         long seed = System.currentTimeMillis();
         Random random = new Random(seed);
-        entity.setSeed(random.nextInt());
-        entity.setCurrentposition("[-1,0]");
+        MapEntity map = this.getOne(updateWrapper);
+        if(map==null){
+            entity.setSeed(random.nextInt());
+            entity.setCurrentposition("[-1,0]");
+        }
+
         return super.saveOrUpdate(entity, updateWrapper);
     }
 

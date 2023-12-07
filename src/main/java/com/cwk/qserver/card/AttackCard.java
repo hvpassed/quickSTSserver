@@ -13,4 +13,6 @@ public class AttackCard extends Card {
     public AttackCard(int cardIdByAnn) {
         super(cardIdByAnn);
     }
+
+
 }

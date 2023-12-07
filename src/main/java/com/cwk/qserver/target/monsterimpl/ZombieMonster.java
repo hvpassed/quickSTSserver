@@ -89,6 +89,8 @@ public class ZombieMonster extends Monster implements monsterImpl {
             intent.setAim(intent.getAims().get(1));
             intent.setType(1);
         }else{
+            intent.setBlockGain(aveBlock+addOrDe*random.nextInt(maxDeltaBlock));
+            intent.setAim(intent.getAims().get(2));
             intent.setType(2);
         }
 
