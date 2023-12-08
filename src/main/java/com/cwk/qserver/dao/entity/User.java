@@ -32,4 +32,12 @@ public class User {
     @JsonProperty("enter_pos")
     @TableField(exist = false)
     public String enterPos;
+
+    @JsonProperty("public_key")
+    @TableField(value = "public_key")
+    public String publicKey;
+
+    @JsonProperty("private_key")
+    @TableField(value = "private_key")
+    public String privateKey;
 }
