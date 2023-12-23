@@ -124,30 +124,36 @@ public class BattleController {
             Set<Integer> cardids = new HashSet<>();
             cardids.add(cardid);
             Card card = cardFactory.createCardById(cardids).get(0);
+            BattlePlayer battlePlayer = battlePlayerService.getById(entity.getUserid());
             if(card==null){
                 throw new RuntimeException();
             }
             if(card.getSelect()== CardTargetConstant.SINGLE_MONSTER){
-               Monster monster = battleManager.CardImpactMonster(cardid,entity.getTargetMonsterid());
-               ret.put("monster",monster);
+               Map<String,Object> dm = battleManager.CardImpactMonster(cardid,entity.getTargetMonsterid());
+               ret.put("monster",dm.get("monster"));
+               int delta = (Integer) dm.get("damageout");
+               battlePlayer.setDamageout(battlePlayer.getDamageout()+delta );
             } else if (card.getSelect()==CardTargetConstant.ALL_MONSTERS){
-                List<Monster> monsters = battleManager.CardImpactAllMonster(cardid);
-                ret.put("monsters",monsters);
+                Map<String,Object> dm =battleManager.CardImpactAllMonster(cardid);
+                ret.put("monsters",dm.get("monsters"));
+                int delta = (Integer) dm.get("damageout");
+                battlePlayer.setDamageout(battlePlayer.getDamageout()+delta );
             }else if(card.getSelect()==CardTargetConstant.SELF){
                 BattlePlayer battlePlayerIn = battleManager.CardImpactPlayer(cardid);
-
                 battlePlayerIn.setDrawPile((List<Integer>) ret.get("drawCardids"));
                 battlePlayerIn.setHandPile((List<Integer>) ret.get("handCardids"));
                 battlePlayerIn.setDiscordPile((List<Integer>) ret.get("discordCardids"));
                 battlePlayerIn.serialize();
+                battlePlayer =battlePlayerIn;
                 ret.put("battle_player",battlePlayerIn);
             }
             ret.put("target_type",card.getSelect());
-            BattlePlayer battlePlayer = battlePlayerService.getById(entity.getUserid());
+
             battlePlayer.setDrawPile((List<Integer>) ret.get("drawCardids"));
             battlePlayer.setHandPile((List<Integer>) ret.get("handCardids"));
             battlePlayer.setDiscordPile((List<Integer>) ret.get("discordCardids"));
             battlePlayer.serialize();
+            battlePlayer.setCardplay(battlePlayer.getCardplay()+1);
             battlePlayerService.saveOrUpdate(battlePlayer);
 
             return Response.builder().code(ResponseConstant.RES_OK).msg("成功出牌").data(ret).build();
@@ -349,6 +355,13 @@ public class BattleController {
             //删除map
             QueryWrapper<MapEntity> mapEntityQueryWrapper = Wrappers.query();
             mapEntityQueryWrapper.eq("userid",userid).eq("mapid",mapid);
+            QueryWrapper<Player> playerQueryWrapper = Wrappers.query();
+            playerQueryWrapper.eq("userid",userid);
+            Player player = playerService.getOne(playerQueryWrapper);
+            if(player==null){
+                log.error("Could not find player by userid:"+userid);
+                throw new RuntimeException();
+            }
             MapServiceimpl mapServiceimpl = ApplicationContextUtil.getBean(MapServiceimpl.class);
             mapServiceimpl.remove(mapEntityQueryWrapper);
 
@@ -365,7 +378,7 @@ public class BattleController {
             user.setHasmap(0);
             userServiceimpl.saveOrUpdate(user,userQueryWrapper);
 
-            return Response.builder().code(ResponseConstant.RES_OK).msg("成功删除游戏").data("").build();
+            return Response.builder().code(ResponseConstant.RES_OK).msg("成功删除游戏").data(player).build();
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());

@@ -14,15 +14,15 @@ spring:
       datasource:
         master:
           driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://127.0.0.1:3306/sts?useSSL=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8
+          url: jdbc:mysql://127.0.0.1:3306/sts?useSSL=false&serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
           username: sts
           password: 123
 
 
 mybatis-plus:
 
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  #  configuration:
+  #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: auto
@@ -34,6 +34,8 @@ logging:
 server:
   port: 20002
 
+privateKey: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7N1DT7PN9eoh4xbEJAc7SQfZAz5v0JWq/4WCs5m1LGrDedki9fPqL5aQU/M1/A9nWb1RC6jbsj+e0Rh2LYZKzktd79rZghVG/JH5SlBzMqVTMDuWEMP6L2N+uFgeVtQU2+18LhkR5N+iUOz5UdoFhs6kt2SV6QKNcTVemr0g+TNyD7FlT4SuVlrGxPwSU+WZi/ATdj7erV4NnTuKbc5OAkaJTy8sQswesMvjUJY1BBnUR0qQuS0CgAA+8sm65vvcGd7G/yLaQUP4pYj8oSoerS60IFiBcqy85OqNr8HNvvBcqp0gvLJEwINmACjoRD1onMr8OTgnunueT9AVbrK0fAgMBAAECggEAHPvJVaXfZFOuARSJ/dz7ye1QVGRPvpJ0XlRkBSB/VxtAupARXtSUbUgWCPHCVqGf/eSqZNmhuynkMzKPrF5kucxH8/cT8QlyyGa778jiVIT6jcTYn4h+P+RJbMgYUIL/1a1A36Xfv+x540jws17NVPTdgi2V8cFECSwoH7QPOSWkzZK7CnggHOKaWxjdBOFzUUXYo3ULszE3ZvlKny3z6ShtxUv8L6F5oPwDDKwcA440BwRG0TE5vHWk0mr3ZZoMZIVY7xfKY1NMzjznjNz9hVbHNhTg+2p38Png5Kkhtk3leNEH6qqJDhOj3ENK8uQtLWha2s5jK5OOVsPAgGnZUQKBgQDB9VRu1doPRXP57QiSthWzKV28Gqxhql44/o1c8oipqQ7d4S8S+g3P4BvXLn22hE/HqI8rL9Jt4giivEMwUOknrYVc5zgiOfVjdvIYpTtwOoy/Q4d/TnCiihRF9QLbk1z4Fu1K71CH21Etf916syJNeiBwy9jh79OhIu+/9B0U1QKBgQD3GeI7m14yCYT9KTWVgREC1nqoz3YatBhca3alFifySqjLELg8DzxfwKTuqXYqaeXe/FsxzcYcBcqVBHoZGlQRsTafN7hbiby+IkWdgpdVJg18dMXCM9ZyWzvqi9G6ZFRT8c1zFrh3hw4Ys3ELTzZ4x1/pWrL5ayu2aUsj16GEIwKBgA+qLbiJ4wOqu1QrFa8rr5L5u01O5i85IEUAIhCoserp8X5wCmpA8c6hLf5yDcso4nygm3eEdD1VrRbfl5mWX05KEGRRdFInVi9DUwg0iBlnUSi9Xnskraoi9sIzqJhtTWvoBiAwNdPTHbpMAmo/f3y8aVRS0mBlCzWPaceaAqNFAoGBALBp3Vea++wTWcv4UNY0+DUjdRzySKqV61KIMoN4Rvq3jLy1aiMO6ZafDeGKQN/VDRVe66ip9YdqJxCuypEDeAPNlmajvE42DvdbtoHWiz5yVWyGXe3hXnf0ZNl2CzzchkwMNRa2oOpNFKZT7iAZ5JTkGriaVW62sdWgZNHpD9orAoGAKBS6ocela3ovYBERCJ64DFQdnXPGFvuBX3UlhEd4IO/w5IwlTzP68V1xExqQ0fuV+KHH0eoI8/3VC3v0rc2KD4JaL1gpU0IVp+i02lsDXRki/nCDBgp3bXwUCqx9lt0oMfDkjIy6PdBPXGzn4hkTFr4aFa3cxiEDf7CncDDQ29Y=
+publicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuzdQ0+zzfXqIeMWxCQHO0kH2QM+b9CVqv+FgrOZtSxqw3nZIvXz6i+WkFPzNfwPZ1m9UQuo27I/ntEYdi2GSs5LXe/a2YIVRvyR+UpQczKlUzA7lhDD+i9jfrhYHlbUFNvtfC4ZEeTfolDs+VHaBYbOpLdklekCjXE1Xpq9IPkzcg+xZU+ErlZaxsT8ElPlmYvwE3Y+3q1eDZ07im3OTgJGiU8vLELMHrDL41CWNQQZ1EdKkLktAoAAPvLJuub73Bnexv8i2kFD+KWI/KEqHq0utCBYgXKsvOTqja/Bzb7wXKqdILyyRMCDZgAo6EQ9aJzK/Dk4J7p7nk/QFW6ytHwIDAQAB
 init-cardspile-config:
   cardList:
 

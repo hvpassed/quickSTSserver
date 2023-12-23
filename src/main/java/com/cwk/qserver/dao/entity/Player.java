@@ -1,5 +1,6 @@
 package com.cwk.qserver.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -29,5 +30,16 @@ public class Player {
     @JsonProperty("cardids")
     public String cardids;
 
+    @JsonProperty("cardplay")
+    @TableField(value = "cardplay")
+    public int cardplay=0;
+
+    @JsonProperty("damagerecive")
+    @TableField(value = "damagerecive")
+    public int damagerecive=0;
+
+    @JsonProperty("damageout")
+    @TableField(value = "damageout")
+    public int damageout=0;
 
 }

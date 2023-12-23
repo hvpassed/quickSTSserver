@@ -24,7 +24,7 @@ public class DoubleAttack extends AttackCard {
     public DoubleAttack(){
         super(getCardIdByAnn());
         this.attackCount=2;
-        this.damage = 10;
+        this.damage = 15;
         this.title="双重攻击";
         this.description=String.format("造成%d次%d点伤害",this.attackCount,this.damage);
         this.cost=2;

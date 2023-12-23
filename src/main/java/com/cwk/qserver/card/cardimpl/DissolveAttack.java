@@ -22,7 +22,7 @@ public class DissolveAttack extends AttackCard {
     public DissolveAttack(){
         super(getCardIdByAnn());
         this.attackCount=1;
-        this.damage = 10;
+        this.damage = 15;
         this.title="溶解攻击";
         this.description=String.format("溶解敌人护甲，然后造成%d伤害",this.damage);
         this.cost=1;

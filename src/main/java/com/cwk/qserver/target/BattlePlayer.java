@@ -70,7 +70,17 @@ public class BattlePlayer  {
     @TableField(exist = false)
     public List<Integer> discordPile = new ArrayList<>();
 
+    @JsonProperty("cardplay")
+    @TableField(value = "cardplay")
+    public int cardplay=0;
 
+    @JsonProperty("damagerecive")
+    @TableField(value = "damagerecive")
+    public int damagerecive=0;
+
+    @JsonProperty("damageout")
+    @TableField(value = "damageout")
+    public int damageout=0;
 
     public void clearBlock(){
         if(this.blockClear==0){

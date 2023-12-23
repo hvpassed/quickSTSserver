@@ -366,7 +366,7 @@ public class BattleManager {
         return this.battlePlayer;
 
     }
-    public List<Monster> CardImpactAllMonster(int cardid) throws RuntimeException{
+    public Map<String,Object> CardImpactAllMonster(int cardid) throws RuntimeException{
         //卡牌以全体为目标
         MonsterServiceimpl monsterService = ApplicationContextUtil.getBean(MonsterServiceimpl.class);
         List<Monster>  monsters = monsterService.listByIds(this.monstersList);
@@ -374,6 +374,11 @@ public class BattleManager {
             log.error("Could not find monster by monsterids:"+this.monstersList.toString());
             throw new RuntimeException();
         }
+        int nowHp = 0;
+        for (Monster monster:monsters
+             ) {
+            nowHp+=monster.getNowhp();
+        }
         CardFactory cardFactory = ApplicationContextUtil.getBean(CardFactory.class);
         Set<Integer> cardids = new HashSet<>();
         cardids.add(cardid);
@@ -382,19 +387,28 @@ public class BattleManager {
             log.error("Could not find card by cardid:"+cardid);
             throw new RuntimeException();
         }
+        int delta = 0;
+        Map<String,Object> ret = new HashMap<>();
         Card card = cardList.get(0);
         card.impactAll(monsters);
         monsterService.saveOrUpdateBatch(monsters);
-
-        return monsters;
+        for (Monster monster:monsters
+        ) {
+            delta+=monster.getNowhp();
+        }
+        delta = nowHp-delta;
+        ret.put("damageout",delta);
+        ret.put("monsters",monsters);
+        return ret;
     }
-    public Monster CardImpactMonster(int cardid,int monsterid) throws RuntimeException{
+    public Map<String,Object> CardImpactMonster(int cardid,int monsterid) throws RuntimeException{
         MonsterServiceimpl monsterService = ApplicationContextUtil.getBean(MonsterServiceimpl.class);
         Monster monster = monsterService.getById(monsterid);
         if(monster==null){
             log.error("Could not find monster by monsterid:"+monsterid);
             throw new RuntimeException();
         }
+        int nowHp = monster.getNowhp();
         CardFactory cardFactory = ApplicationContextUtil.getBean(CardFactory.class);
         Set<Integer> cardids = new HashSet<>();
         cardids.add(cardid);
@@ -403,13 +417,15 @@ public class BattleManager {
             log.error("Could not find card by cardid:"+cardid);
             throw new RuntimeException();
         }
+        Map<String,Object> ret = new HashMap<>();
         Card card = cardList.get(0);
 
         card.impact(monster);
-
+        int delta = nowHp-monster.getNowhp();
+        ret.put("damageout",delta);
         monsterService.saveOrUpdate(monster);
-
-        return monster;
+        ret.put("monster",monster);
+        return ret;
     }
 
 
@@ -418,6 +434,7 @@ public class BattleManager {
         List<Monster> monsters  = new ArrayList<>();
         Map<Integer,Class<?>> monsterType = Monster.getMonsterTypeMap();
         Map<Integer,Intent> IntentList = new HashMap<>();
+        int nowHp = battlePlayer.getNowhp();
         for(int i = 0;i<this.monstersList.size();i++){
             MonsterServiceimpl monsterService = ApplicationContextUtil.getBean(MonsterServiceimpl.class);
             Monster monsterObj = monsterService.getById(this.monstersList.get(i));
@@ -456,6 +473,8 @@ public class BattleManager {
                 monsters.add((Monster) obj);
             }
         }
+        int delta = nowHp-battlePlayer.getNowhp();
+        battlePlayer.setDamagerecive(battlePlayer.getDamagerecive()+delta);
         battlePlayer.clearBlock();
         BattlePlayerServiceimpl battlePlayerServiceimpl = ApplicationContextUtil.getBean(BattlePlayerServiceimpl.class);
         battlePlayerServiceimpl.saveOrUpdate(battlePlayer);
@@ -495,7 +514,12 @@ public class BattleManager {
         player.setPlaying(1);
 
         List<Integer> allCardids =CardsPile.unSerialize( player.getCardids());
+
         player.setNowhp(battlePlayer.getNowhp());
+        player.setCardplay(battlePlayer.getCardplay()+player.getCardplay());
+        player.setDamagerecive(battlePlayer.getDamagerecive()+player.getDamagerecive());
+        player.setDamageout(battlePlayer.getDamageout()+player.getDamageout());
+
         playerService.saveOrUpdate(player,playerQueryWrapper);
         removeBattle(userid);
 

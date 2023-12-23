@@ -16,10 +16,6 @@ public class QServerApplication {
 
 
 		SpringApplication.run(QServerApplication.class, args);
-
-
-
-
 	}
 
 }

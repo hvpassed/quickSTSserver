@@ -35,7 +35,6 @@ public class AuthController {
     private UserServiceimpl userServiceimpl;
 
 
-
     @PostMapping("/logging")
     @ResponseBody
     public Response logging(@RequestBody User loggingpara){
@@ -53,7 +52,7 @@ public class AuthController {
             }
 
             String hashedPassword = rs.getPassword();
-            String decodePassword = decryptPassword(loggingpara.getPassword(),rs.getPrivateKey());
+            String decodePassword = loggingpara.getPassword();
             boolean isCorrect = BCrypt.checkpw(decodePassword, hashedPassword);
             if(isCorrect){
                 rs.setPassword("");
@@ -73,13 +72,50 @@ public class AuthController {
         }
     }
 
+
+//    @PostMapping("/logging")
+//    @ResponseBody
+//    public Response logging(@RequestBody User loggingpara){
+//        try {
+//            log.info("try log in user:"+loggingpara.getUsername());
+//            QueryWrapper<User> wrapper = Wrappers.query();
+//
+//
+//            wrapper.eq("username",loggingpara.username);
+//            User rs = userServiceimpl.getOne(wrapper);
+//            if(rs==null){
+//                return Response.builder().code(LoggingConstant.USERNAME_OR_PASSWORD_ERR)
+//                        .msg("USERNAME OR PASSWORD ERR")
+//                        .data("").build();
+//            }
+//
+//            String hashedPassword = rs.getPassword();
+//            String decodePassword = decryptPassword(loggingpara.getPassword(),rs.getPrivateKey());
+//            boolean isCorrect = BCrypt.checkpw(decodePassword, hashedPassword);
+//            if(isCorrect){
+//                rs.setPassword("");
+//                rs.setPublicKey("");
+//                rs.setPrivateKey("");
+//                return Response.builder().code(LoggingConstant.PASS).msg("Logging Success").data(rs).build();
+//            }
+//            else {
+//                return Response.builder().code(LoggingConstant.USERNAME_OR_PASSWORD_ERR)
+//                        .msg("USERNAME OR PASSWORD ERR")
+//                        .data("").build();
+//            }
+//        }
+//        catch (Exception e){
+//            log.error(e.toString());
+//            return Response.builder().code(LoggingConstant.UNEXCEP_ERR).msg("err "+e.toString()).data("").build();
+//        }
+//    }
+
     @PostMapping("/getPublicKey")
     @ResponseBody
     public Response getPublicKey(@RequestBody User entity){
         try {
 
             QueryWrapper<User> wrapper = Wrappers.query();
-
 
             wrapper.eq("username",entity.username);
             User rs = userServiceimpl.getOne(wrapper);
@@ -128,13 +164,12 @@ public class AuthController {
             return Response.builder().code(LoggingConstant.UNEXCEP_ERR).msg("Unexcept_err").data("").build();
         }
     }
-
     @PostMapping("/sign")
     @ResponseBody
     public Response sign(@RequestBody User entity){
         try {
             String username =entity.getUsername();
-            String password = entity.getPassword();//加密过的
+            String password = entity.getPassword();
             QueryWrapper<User> userQueryWrapper = Wrappers.query();
             userQueryWrapper.eq("username",username);
             User user = userServiceimpl.getOne(userQueryWrapper);
@@ -143,9 +178,9 @@ public class AuthController {
                         .msg("USERNAME OR PASSWORD ERR")
                         .data("").build();
             }
-            String decodePassword = decryptPassword(password,user.getPrivateKey());
+            //String decodePassword = decryptPassword(password,user.getPrivateKey());
 
-            String hashedPassword = BCrypt.hashpw(decodePassword, BCrypt.gensalt());
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
             user.setPassword(hashedPassword);
             userServiceimpl.saveOrUpdate(user);
             return Response.builder().code(LoggingConstant.SIGN_IN_SUCCESS).msg("signed").data("").build();
@@ -156,6 +191,33 @@ public class AuthController {
 
         }
     }
+//    @PostMapping("/sign")
+//    @ResponseBody
+//    public Response sign(@RequestBody User entity){
+//        try {
+//            String username =entity.getUsername();
+//            String password = entity.getPassword();//加密过的
+//            QueryWrapper<User> userQueryWrapper = Wrappers.query();
+//            userQueryWrapper.eq("username",username);
+//            User user = userServiceimpl.getOne(userQueryWrapper);
+//            if(user==null){
+//                return Response.builder().code(LoggingConstant.UNEXCEP_ERR)
+//                        .msg("USERNAME OR PASSWORD ERR")
+//                        .data("").build();
+//            }
+//            String decodePassword = decryptPassword(password,user.getPrivateKey());
+//
+//            String hashedPassword = BCrypt.hashpw(decodePassword, BCrypt.gensalt());
+//            user.setPassword(hashedPassword);
+//            userServiceimpl.saveOrUpdate(user);
+//            return Response.builder().code(LoggingConstant.SIGN_IN_SUCCESS).msg("signed").data("").build();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            log.error("Unexcepted err"+e.toString());
+//            return Response.builder().code(LoggingConstant.UNEXCEP_ERR).msg("Unexcept_err").data("").build();
+//
+//        }
+//    }
 
 
     public Map<String,String> convertKeyToString(KeyPair key) {

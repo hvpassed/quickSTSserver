@@ -24,7 +24,7 @@ public class SweepAttack extends AttackCard {
     public SweepAttack(){
         super(getCardIdByAnn());
         this.attackCount=1;
-        this.damage = 10;
+        this.damage = 15;
         this.title="横扫攻击";
         this.description=String.format("对所有敌人造成%d点伤害",this.damage);
         this.cost=1;
